@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Venn Diagnostic</title>
+<meta property="og:title" content="German, Autistic, or Gay?">
+<meta property="og:description" content="A rigorous diagnostic. 15 questions. Three circles. One uncomfortable Venn diagram.">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --dark: #0a0a0a;
+    --dark-mid: #1a1a1a;
+    --dark-light: #2a2a2a;
+    --gold: #c4a35a;
+    --gold-light: #d4b96a;
+    --cream: #f5f0e8;
+    --text: #e0dcd4;
+    --muted: #999;
+    --serif: 'EB Garamond', Georgia, serif;
+    --sans: Inter, -apple-system, sans-serif;
+    --german: #5b8cb8;
+    --autistic: #6aab7b;
+    --gay: #c76b9b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: var(--serif);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  .hero {
+    max-width: 680px;
+    margin: 80px auto 0;
+    padding: 0 24px;
+    text-align: center;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 400;
+    color: var(--cream);
+    line-height: 1.15;
+    margin-bottom: 20px;
+  }
+
+  .hero p {
+    color: var(--muted);
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+
+  .hero .sub {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: #666;
+    margin-top: 8px;
+  }
+
+  .progress-bar {
+    max-width: 680px;
+    margin: 32px auto 0;
+    padding: 0 24px;
+  }
+
+  .progress-track {
+    background: var(--dark-light);
+    border-radius: 4px;
+    height: 4px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    background: var(--gold);
+    height: 100%;
+    width: 0%;
+    transition: width 0.4s ease;
+    border-radius: 4px;
+  }
+
+  .progress-label {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+    text-align: right;
+  }
+
+  .question-area {
+    max-width: 680px;
+    margin: 40px auto 0;
+    padding: 0 24px;
+  }
+
+  .question-card {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .question-card.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .question-number {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .question-text {
+    font-size: clamp(1.2rem, 2.5vw, 1.55rem);
+    color: var(--cream);
+    line-height: 1.5;
+    margin-bottom: 32px;
+    font-weight: 400;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .option {
+    background: var(--dark-mid);
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    font-family: var(--serif);
+    font-size: 1rem;
+    color: var(--text);
+    text-align: left;
+    line-height: 1.5;
+  }
+
+  .option:hover {
+    border-color: var(--gold);
+    background: #1e1a14;
+    color: var(--cream);
+  }
+
+  .option.selected {
+    border-color: var(--gold);
+    background: #1e1a14;
+    color: var(--cream);
+  }
+
+  .btn-next {
+    margin-top: 28px;
+    background: var(--gold);
+    color: var(--dark);
+    border: none;
+    border-radius: 4px;
+    padding: 14px 36px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.18s ease;
+    display: none;
+  }
+
+  .btn-next:hover { background: var(--gold-light); }
+
+  #results {
+    display: none;
+    max-width: 680px;
+    margin: 60px auto 0;
+    padding: 0 24px;
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .result-label {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .result-type {
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: var(--cream);
+    font-weight: 400;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .result-subtype {
+    font-size: 1.05rem;
+    color: var(--gold);
+    margin-bottom: 32px;
+    font-style: italic;
+  }
+
+  .result-divider {
+    width: 60px;
+    height: 1px;
+    background: var(--gold);
+    margin: 0 auto 32px;
+    opacity: 0.5;
+  }
+
+  .venn-container {
+    margin: 0 auto 32px;
+    max-width: 420px;
+  }
+
+  .venn-container svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .score-bars {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin: 32px 0;
+    text-align: left;
+  }
+
+  .score-item {
+    background: var(--dark-mid);
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    padding: 16px;
+  }
+
+  .score-item-label {
+    font-family: var(--sans);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .score-item-bar {
+    background: #1a1a1a;
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .score-item-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease 0.3s;
+  }
+
+  .score-item-value {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .result-description {
+    font-size: 1.1rem;
+    color: var(--text);
+    line-height: 1.8;
+    text-align: left;
+    margin-bottom: 40px;
+  }
+
+  .result-description p { margin-bottom: 16px; }
+
+  .share-section {
+    background: var(--dark-mid);
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    padding: 28px;
+    margin-bottom: 32px;
+  }
+
+  .share-title {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .share-text {
+    font-size: 1rem;
+    color: var(--cream);
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .share-btn {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    border-radius: 4px;
+    padding: 10px 24px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    margin: 4px;
+  }
+
+  .share-btn:hover {
+    background: var(--gold);
+    color: var(--dark);
+  }
+
+  .start-btn {
+    background: var(--gold);
+    color: var(--dark);
+    border: none;
+    border-radius: 4px;
+    padding: 16px 48px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 32px;
+    transition: background 0.18s ease;
+  }
+
+  .start-btn:hover { background: var(--gold-light); }
+
+  .retake-btn {
+    background: transparent;
+    border: 1px solid #3a3a3a;
+    color: var(--muted);
+    border-radius: 4px;
+    padding: 10px 24px;
+    font-family: var(--sans);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    margin-top: 8px;
+  }
+
+  .retake-btn:hover {
+    border-color: var(--muted);
+    color: var(--text);
+  }
+
+  @keyframes pulse {
+    0%, 100% { r: 10; opacity: 1; }
+    50% { r: 14; opacity: 0.8; }
+  }
+
+  .venn-dot {
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @media (max-width: 480px) {
+    .score-bars { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 1.9rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="landing">
+  <div class="hero">
+    <h1>German, Autistic,<br>or Gay?</h1>
+    <p>All three involve strong opinions about aesthetics, an inability to let things go, and a complicated relationship with the mainstream.</p>
+    <p>The question is which combination explains you.</p>
+    <p class="sub">15 questions &middot; 2 minutes &middot; One Venn diagram</p>
+    <button class="start-btn" onclick="startQuiz()">Begin the Diagnostic</button>
+  </div>
+</div>
+
+<div id="quiz" style="display:none;">
+  <div class="progress-bar">
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">Question 1 of 15</div>
+  </div>
+  <div class="question-area" id="questionArea"></div>
+</div>
+
+<div id="results">
+  <div class="result-label">Your Diagnosis</div>
+  <div class="result-type" id="resultType"></div>
+  <div class="result-subtype" id="resultSubtype"></div>
+  <div class="result-divider"></div>
+
+  <div class="venn-container" id="vennContainer"></div>
+
+  <div class="score-bars">
+    <div class="score-item">
+      <div class="score-item-label">German</div>
+      <div class="score-item-bar"><div class="score-item-fill" id="barGerman" style="width:0%;background:var(--german)"></div></div>
+      <div class="score-item-value" id="valGerman">0%</div>
+    </div>
+    <div class="score-item">
+      <div class="score-item-label">Autistic</div>
+      <div class="score-item-bar"><div class="score-item-fill" id="barAutistic" style="width:0%;background:var(--autistic)"></div></div>
+      <div class="score-item-value" id="valAutistic">0%</div>
+    </div>
+    <div class="score-item">
+      <div class="score-item-label">Gay</div>
+      <div class="score-item-bar"><div class="score-item-fill" id="barGay" style="width:0%;background:var(--gay)"></div></div>
+      <div class="score-item-value" id="valGay">0%</div>
+    </div>
+  </div>
+  <div style="font-size:0.78rem;color:#888;text-align:center;margin-top:0.4rem;">Scores are independent. They don't add up to anything. Much like you.</div>
+
+  <div class="result-description" id="resultDescription"></div>
+
+  <div class="share-section">
+    <div class="share-title">Share your result</div>
+    <div class="share-text" id="shareText"></div>
+    <button class="share-btn" onclick="shareResult()">Share on X</button>
+    <button class="share-btn" onclick="copyResult()">Copy</button>
+  </div>
+
+  <br>
+  <button class="retake-btn" onclick="retakeQuiz()">Retake the diagnostic</button>
+</div>
+
+<script>
+const questions = [
+  {
+    text: "Your apartment is:",
+    options: [
+      { text: "Functional and orderly. Everything has a designated place. Decoration is not the point.", score: {G:3, A:1, Q:0} },
+      { text: "Organized according to a system only I fully understand, which I could explain at length if asked.", score: {G:1, A:3, Q:0} },
+      { text: "Curated. The throw pillows were not an accident. Neither was the lighting.", score: {G:0, A:0, Q:3} },
+      { text: "Honestly, kind of a mess.", score: {G:0, A:0, Q:0} }
+    ]
+  },
+  {
+    text: "Someone asks \"how are you?\" You:",
+    options: [
+      { text: "Give an honest, brief answer. \"Fine\" if fine. \"Not well\" if not well. Anything else would be dishonest.", score: {G:3, A:1, Q:0} },
+      { text: "Begin answering literally before catching yourself mid-sentence.", score: {G:0, A:3, Q:0} },
+      { text: "\"Surviving. Thriving. Somewhere in between. How's your skin doing?\"", score: {G:0, A:0, Q:3} },
+      { text: "\"Good, you?\"", score: {G:0, A:0, Q:0} }
+    ]
+  },
+  {
+    text: "Your position on brunch:",
+    options: [
+      { text: "An inefficient meal. Choose breakfast or lunch. Combining them solves no problem.", score: {G:3, A:1, Q:0} },
+      { text: "The noise level is challenging but I have identified one restaurant with acceptable acoustics.", score: {G:0, A:3, Q:0} },
+      { text: "A sacred institution. Do not speak to me about efficiency.", score: {G:0, A:0, Q:3} },
+      { text: "It's fine. I don't have strong feelings about it.", score: {G:0, A:0, Q:0} }
+    ]
+  },
+  {
+    text: "Your relationship to club music:",
+    options: [
+      { text: "A cultural tradition. The four-on-the-floor beat is a contribution to world heritage.", score: {G:3, A:0, Q:1} },
+      { text: "I appreciate the repetitive structure and predictable tempo. It is one of the few loud environments I can tolerate.", score: {G:0, A:3, Q:0} },
+      { text: "The club is church. The DJ is the minister. This is not a metaphor.", score: {G:0, A:0, Q:3} },
+      { text: "I can take it or leave it.", score: {G:0, A:0, Q:0} }
+    ]
+  },
+  {
+    text: "You're at a dinner party and the host puts the knife on the wrong side of the plate. You:",
+    options: [
+      { text: "Notice. Say nothing. Respect the host. Suffer internally.", score: {G:3, A:0, Q:0} },
+      { text: "Cannot stop looking at it. It is pulling at something deep. The evening is now about the knife.", score: {G:0, A:3, Q:0} },
+      { text: "Discreetly move it while complimenting something else.", score: {G:0, A:0, Q:3} },
+      { text: "Don't notice.", score: {G:0, A:0, Q:0} }
+    ]
+  },
+  {
+    text: "Your approach to personal grooming:",
+    options: [
+      { text: "Efficient and consistent. The same products, same order, every morning. It works. Why change.", score: {G:3, A:1, Q:0} },
+      { text: "A very specific routine. If one product gets discontinued it genuinely disrupts my week.", score: {G:0, A:3, Q:1} },
+      { text: "A practice. A discipline. An art form. I will not apologize for the number of steps.", score: {G:0, A:0, Q:3} },
+      { text: "Minimal.", score: {G:0, A:0, Q:0} }
+    ]
+  },
+  {
+    text: "When someone is factually wrong in conversation, you:",
+    options: [
+      { text: "Correct them. Politely but firmly. Allowing error to stand is irresponsible.", score: {G:3, A:1, Q:0} },
+      { text: "Correct them with sources. The physical discomfort of uncorrected misinformation is real.", score: {G:1, A:3, Q:0} },
+      { text: "Correct them, but entertainingly. If you're going to be right you should at least be fun about it.", score: {G:0, A:0, Q:3} },
+      { text: "Let it go. It's not worth it.", score: {G:0, A:0, Q:0} }
+    ]
+  },
+  {
+    text: "Your spice rack:",
+    options: [
+      { text: "Alphabetized. Obviously.", score: {G:3, A:1, Q:0} },
+      { text: "Organized by cuisine, frequency of use, and expiration date. There is a spreadsheet.", score: {G:1, A:3, Q:0} },
+      { text: "Sourced from a specific shop I discovered three years ago and have not stopped recommending since.", score: {G:0, A:1, Q:3} },
+      { text: "I just put them wherever they fit.", score: {G:0, A:0, Q:0} }
+    ]
+  },
+  {
+    text: "The concept of \"vibes\" is:",
+    options: [
+      { text: "Imprecise to the point of uselessness. Say what you mean.", score: {G:3, A:1, Q:0} },
+      { text: "Something I have taught myself to detect, like learning a second language by immersion.", score: {G:0, A:3, Q:0} },
+      { text: "Real. The vibe is the thing. If you can't feel it, that's a you problem.", score: {G:0, A:0, Q:3} },
+      { text: "A normal part of social life.", score: {G:0, A:0, Q:0} }
+    ]
+  },
+  {
+    text: "Your approach to visiting a new city:",
+    options: [
+      { text: "Research the transit system, identify efficient routes, visit historically significant sites.", score: {G:3, A:1, Q:0} },
+      { text: "Build a detailed itinerary. Experience genuine distress when plans change.", score: {G:1, A:3, Q:0} },
+      { text: "Find the neighborhood. You know which neighborhood.", score: {G:0, A:0, Q:3} },
+      { text: "Wander around and see what happens.", score: {G:0, A:0, Q:0} }
+    ]
+  },
+  {
+    text: "Your feelings about design:",
+    options: [
+      { text: "Good design is functional design. Bauhaus understood this. Everyone else is decorating.", score: {G:3, A:1, Q:0} },
+      { text: "I notice inconsistencies in kerning, alignment, and color that others seem immune to. It is not a choice.", score: {G:0, A:3, Q:1} },
+      { text: "Design is not optional. It is a way of being in the world and I can tell everything about a person from their font choices.", score: {G:0, A:0, Q:3} },
+      { text: "I don't think about design much.", score: {G:0, A:0, Q:0} }
+    ]
+  },
+  {
+    text: "When you develop an interest in something new:",
+    options: [
+      { text: "I pursue it thoroughly and systematically. Half-knowledge is worse than none.", score: {G:3, A:1, Q:0} },
+      { text: "I learn everything about it in a 72-hour period and cannot explain why. Then I either keep it forever or never touch it again.", score: {G:0, A:3, Q:0} },
+      { text: "It becomes part of my identity within 48 hours. I have already told everyone I know.", score: {G:0, A:1, Q:3} },
+      { text: "I explore it casually.", score: {G:0, A:0, Q:0} }
+    ]
+  },
+  {
+    text: "Your honest opinion on Eurovision:",
+    options: [
+      { text: "A remarkable logistical achievement, whatever you think of the content.", score: {G:3, A:0, Q:0} },
+      { text: "I have strong opinions about the scoring methodology and could explain at length why it is mathematically unsound.", score: {G:1, A:3, Q:0} },
+      { text: "A religious experience. The camp. The drama. The geopolitics expressed through pop music. Transcendent.", score: {G:0, A:0, Q:3} },
+      { text: "I don't watch it.", score: {G:0, A:0, Q:0} }
+    ]
+  },
+  {
+    text: "When someone says \"you're a lot,\" you interpret this as:",
+    options: [
+      { text: "Imprecise feedback. A lot of what? In what context? Specificity would help.", score: {G:3, A:2, Q:0} },
+      { text: "Probably accurate, but I'm genuinely unsure what to do with that information.", score: {G:0, A:3, Q:0} },
+      { text: "A compliment. Obviously.", score: {G:0, A:0, Q:3} },
+      { text: "Mildly insulting.", score: {G:0, A:0, Q:0} }
+    ]
+  },
+  {
+    text: "The real problem with the world is:",
+    options: [
+      { text: "People don't follow the rules they agreed to follow. This is the source of most suffering.", score: {G:3, A:0, Q:0} },
+      { text: "The gap between what people say and what they actually mean. If everyone just said what they meant, everything would be fine.", score: {G:1, A:3, Q:0} },
+      { text: "A catastrophic lack of taste. The aesthetics are a symptom. The rot is deeper.", score: {G:0, A:0, Q:3} },
+      { text: "Something more complicated than a single answer.", score: {G:0, A:0, Q:0} }
+    ]
+  }
+];
+
+const results = {
+  none: {
+    type: "Neither",
+    subtype: "Somehow.",
+    description: `<p>You are, as far as this diagnostic can establish, none of the above. Not particularly German in your habits, not notably autistic in your cognition, and not especially gay in your sensibilities. You are the rarest result on this quiz: apparently normal about everything.</p>
+<p>You probably ended up here through social media. Someone who scored All Three sent it to you. You are their control group. They are fascinated by you in the way anthropologists are fascinated by uncontacted tribes.</p>
+<p>Aristotle thought the good life was the mean between extremes. He was, by all accounts, none of the three things on this quiz. He was also the least interesting Greek philosopher. Make of that what you will.</p>`,
+    shareText: "I took the German/Autistic/Gay Venn diagnostic and scored None. I am the control group."
+  },
+  G: {
+    type: "German",
+    subtype: "Just German.",
+    description: `<p>Your patterns are cultural, not neurological, and your aesthetics are functional, not fabulous. You have internalized a value system built on precision, directness, and the moral weight of following through on what you said you would do.</p>
+<p>Kant's categorical imperative is basically your operating system: act only according to rules you would want universalized. You probably haven't read Kant, but you don't need to, because you absorbed it through some combination of upbringing, temperament, and the basic recognition that it is simply correct.</p>
+<p>You are difficult in the way all serious people are difficult. You are reliable in the way few people are reliable. The world doesn't appreciate this as much as it should, and you have made your peace with that, because making peace with things you cannot change is also very German.</p>`,
+    shareText: "German/Autistic/Gay diagnostic result: just German. Kant would approve."
+  },
+  A: {
+    type: "Autistic",
+    subtype: "The pattern is neurological.",
+    description: `<p>The patterns here are neurological rather than cultural or aesthetic. The intensity of focus, the literal relationship to language, the fact that you have calculated the exact recovery time after an interruption \u2014 these are features of a particular kind of mind.</p>
+<p>Wittgenstein spent years trying to establish what language actually means when it appears to mean something. The Tractatus ends with "Whereof one cannot speak, thereof one must be silent." Some people read that as philosophy. You read it as obvious.</p>
+<p>The capacity for systematic thought is not a disorder. The difficulty is that the world is not systematic, and other people's behavior is governed by rules that are never written down, shift without announcement, and apparently don't bother anyone else.</p>
+<p>This is more information than a 15-question quiz can establish. Take it as a direction, not a verdict.</p>`,
+    shareText: "German/Autistic/Gay Venn diagnostic: just autistic. Wittgenstein would have gotten the same."
+  },
+  Q: {
+    type: "Gay",
+    subtype: "The taste was the tell.",
+    description: `<p>Your patterns are aesthetic and cultural. You navigate the world through taste, sensibility, and an awareness of presentation that most people either lack or refuse to develop. The throw pillows were not an accident. The font choices were not arbitrary. You know which neighborhood.</p>
+<p>Oscar Wilde understood that being right isn't enough \u2014 you have to be interesting about it. Susan Sontag understood that surfaces are not superficial. You have internalized both lessons without necessarily having read either person, because culture is a river and you are in it.</p>
+<p>The thing people misunderstand about taste is that it looks effortless from outside. They don't see the thousand micro-decisions, the curation, the editing. They just see the result and call it \"natural.\" It is not natural. It is a discipline. You know this.</p>`,
+    shareText: "German/Autistic/Gay diagnostic result: just Gay. The taste was the tell."
+  },
+  GA: {
+    type: "German + Autistic",
+    subtype: "The Wittgenstein Result",
+    description: `<p>Wittgenstein was Austrian, which is close enough. He was also someone whose relationship to social convention was at best functional and at worst a source of significant suffering to himself and everyone around him.</p>
+<p>He rewrote philosophy twice. First by establishing what could be said with precision. Then by dismantling the assumption that precision was the right goal. Both emerged from the same source: an absolute refusal to accept confusion as a resting state.</p>
+<p>You have the cultural formation that produces systematic people and the neurological wiring that makes systematic thinking feel like breathing. Rules make sense to you \u2014 both following them and building them. Ambiguity is not interesting. It is incorrect.</p>
+<p>This combination is either a significant advantage or an explanation for certain recurring interpersonal difficulties. Almost certainly both.</p>`,
+    shareText: "German/Autistic/Gay Venn diagnostic: German + Autistic. The Wittgenstein Result."
+  },
+  GQ: {
+    type: "German + Gay",
+    subtype: "The Berlin Result",
+    description: `<p>Berlin is, at its core, the city that proved you can combine rigor with style, discipline with liberation, engineering with nightlife. You are the human version of that thesis.</p>
+<p>You value precision, but you also understand that precision without beauty is just bureaucracy. You follow rules, but you know which rules are worth breaking and \u2014 more importantly \u2014 you know how to break them with intention rather than chaos.</p>
+<p>Fassbinder made films with German precision about the lives of people on the margins. Kraftwerk made music that was simultaneously mechanical and sensual. There is a tradition here: the marriage of form and feeling, structure and style. You are in that lineage whether you know it or not.</p>
+<p>People underestimate this combination. They assume order and aesthetics are opposed. You know they're the same thing, expressed differently.</p>`,
+    shareText: "German/Autistic/Gay Venn result: German + Gay. The Berlin Result. Structure meets style."
+  },
+  AQ: {
+    type: "Autistic + Gay",
+    subtype: "The Turing Result",
+    description: `<p>Alan Turing built a machine that could think, helped win a war with pattern recognition, and was prosecuted for who he loved. The intersection of a mind that sees systems everywhere and a life that refuses to fit the expected pattern \u2014 that's where you are.</p>
+<p>You notice things. The kerning. The subtext. The way someone's outfit contradicts what they just said. You process the world at a resolution most people don't operate at, and the things you notice exist on a spectrum from design inconsistencies to the emotional weather of a room.</p>
+<p>The 72-hour deep dive into a new interest that becomes part of your identity by hour 48? That's both of these at once. The pattern recognition is autistic. The self-expression is gay. The combination is a kind of intensity that most people find either magnetic or exhausting. Usually both.</p>
+<p>You have excellent taste and you can explain exactly why it's correct.</p>`,
+    shareText: "German/Autistic/Gay Venn result: Autistic + Gay. The Turing Result. I notice everything and I have opinions about all of it."
+  },
+  GAQ: {
+    type: "All Three",
+    subtype: "The Full Venn",
+    description: `<p>You are the center of the diagram. The place where precision, pattern recognition, and taste converge into a single, highly specific person who alphabetizes their spice rack, knows exactly which neighborhood to find in a new city, and experiences physical discomfort when someone uses the wrong font.</p>
+<p>Wittgenstein, Turing, Fassbinder \u2014 history is full of people at this intersection, though most of them would have denied at least one circle. You are what happens when someone cares deeply about rules, systems, and aesthetics simultaneously. You are thorough, perceptive, and curated. You are, by any reasonable measure, a lot.</p>
+<p>The advantage of occupying the center of this particular Venn diagram is that you can see all three perspectives at once. The disadvantage is that most rooms you walk into are operating at a lower resolution than the one you live at, and they will never fully appreciate the effort you put into everything.</p>
+<p>That is fine. You are not doing it for them.</p>`,
+    shareText: "German/Autistic/Gay Venn diagnostic: ALL THREE. The Full Venn. I am the center of the diagram."
+  }
+};
+
+let scores = { G: 0, A: 0, Q: 0 };
+let current = 0;
+let selectedOption = null;
+
+function startQuiz() {
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  const area = document.getElementById('questionArea');
+
+  const shuffled = [...q.options];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  area.innerHTML = `
+    <div class="question-card active">
+      <div class="question-number">Question ${current + 1} of ${questions.length}</div>
+      <div class="question-text">${q.text}</div>
+      <div class="options" id="optionsList">
+        ${shuffled.map(opt => `
+          <button class="option" onclick="selectOption(this, ${JSON.stringify(opt.score).replace(/"/g, '&quot;')})">
+            ${opt.text}
+          </button>
+        `).join('')}
+      </div>
+      <button class="btn-next" id="btnNext" onclick="nextQuestion()">
+        ${current < questions.length - 1 ? 'Next' : 'See My Diagnosis'}
+      </button>
+    </div>
+  `;
+
+  const pct = ((current + 1) / questions.length) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `Question ${current + 1} of ${questions.length}`;
+  selectedOption = null;
+}
+
+function selectOption(el, score) {
+  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedOption = score;
+  document.getElementById('btnNext').style.display = 'inline-block';
+}
+
+function nextQuestion() {
+  if (!selectedOption) return;
+  scores.G += selectedOption.G || 0;
+  scores.A += selectedOption.A || 0;
+  scores.Q += selectedOption.Q || 0;
+  current++;
+  if (current < questions.length) {
+    renderQuestion();
+  } else {
+    showResults();
+  }
+}
+
+function buildVenn(gHigh, aHigh, qHigh) {
+  // Circle centers and radius for the Venn diagram
+  const cx1 = 165, cy1 = 140, r = 105; // German (top-left)
+  const cx2 = 275, cy2 = 140;           // Autistic (top-right)
+  const cx3 = 220, cy3 = 235;           // Gay (bottom-center)
+
+  // Dot positions for each region
+  const dots = {
+    G:   { x: 125, y: 100 },
+    A:   { x: 315, y: 100 },
+    Q:   { x: 220, y: 290 },
+    GA:  { x: 220, y: 105 },
+    GQ:  { x: 160, y: 215 },
+    AQ:  { x: 280, y: 215 },
+    GAQ: { x: 220, y: 175 },
+    none:{ x: 30,  y: 30  }
+  };
+
+  let key = '';
+  if (gHigh) key += 'G';
+  if (aHigh) key += 'A';
+  if (qHigh) key += 'Q';
+  if (!key) key = 'none';
+
+  const dot = dots[key];
+
+  return `<svg viewBox="0 0 440 360" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+
+    <!-- Circles -->
+    <circle cx="${cx1}" cy="${cy1}" r="${r}" fill="rgba(91,140,184,0.18)" stroke="rgba(91,140,184,0.5)" stroke-width="1.5"/>
+    <circle cx="${cx2}" cy="${cy2}" r="${r}" fill="rgba(106,171,123,0.18)" stroke="rgba(106,171,123,0.5)" stroke-width="1.5"/>
+    <circle cx="${cx3}" cy="${cy3}" r="${r}" fill="rgba(199,107,155,0.18)" stroke="rgba(199,107,155,0.5)" stroke-width="1.5"/>
+
+    <!-- Labels -->
+    <text x="${cx1 - 55}" y="${cy1 - 75}" fill="#5b8cb8" font-family="Inter,-apple-system,sans-serif" font-size="13" font-weight="600" letter-spacing="0.08em" text-transform="uppercase">GERMAN</text>
+    <text x="${cx2 + 10}" y="${cy2 - 75}" fill="#6aab7b" font-family="Inter,-apple-system,sans-serif" font-size="13" font-weight="600" letter-spacing="0.08em">AUTISTIC</text>
+    <text x="${cx3 - 15}" y="${cy3 + 95}" fill="#c76b9b" font-family="Inter,-apple-system,sans-serif" font-size="13" font-weight="600" letter-spacing="0.08em">GAY</text>
+
+    <!-- Result dot -->
+    <circle class="venn-dot" cx="${dot.x}" cy="${dot.y}" r="10" fill="var(--gold)" filter="url(#glow)"/>
+    <circle cx="${dot.x}" cy="${dot.y}" r="4" fill="var(--dark)"/>
+  </svg>`;
+}
+
+function showResults() {
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+
+  const maxScore = questions.length * 3;
+  const gPct = Math.round((scores.G / maxScore) * 100);
+  const aPct = Math.round((scores.A / maxScore) * 100);
+  const qPct = Math.round((scores.Q / maxScore) * 100);
+
+  const threshold = 35;
+  const gHigh = gPct >= threshold;
+  const aHigh = aPct >= threshold;
+  const qHigh = qPct >= threshold;
+
+  let resultKey;
+  if (gHigh && aHigh && qHigh) resultKey = 'GAQ';
+  else if (gHigh && aHigh) resultKey = 'GA';
+  else if (gHigh && qHigh) resultKey = 'GQ';
+  else if (aHigh && qHigh) resultKey = 'AQ';
+  else if (gHigh) resultKey = 'G';
+  else if (aHigh) resultKey = 'A';
+  else if (qHigh) resultKey = 'Q';
+  else resultKey = 'none';
+
+  const r = results[resultKey];
+
+  document.getElementById('resultType').textContent = r.type;
+  document.getElementById('resultSubtype').textContent = r.subtype;
+  document.getElementById('resultDescription').innerHTML = r.description;
+  document.getElementById('shareText').textContent = r.shareText;
+  document.getElementById('vennContainer').innerHTML = buildVenn(gHigh, aHigh, qHigh);
+
+  setTimeout(() => {
+    document.getElementById('barGerman').style.width = gPct + '%';
+    document.getElementById('valGerman').textContent = gPct + '%';
+    document.getElementById('barAutistic').style.width = aPct + '%';
+    document.getElementById('valAutistic').textContent = aPct + '%';
+    document.getElementById('barGay').style.width = qPct + '%';
+    document.getElementById('valGay').textContent = qPct + '%';
+  }, 200);
+
+  window.scrollTo(0, 0);
+}
+
+function shareResult() {
+  const text = document.getElementById('shareText').textContent;
+  const url = window.location.href;
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
+}
+
+function copyResult() {
+  const text = document.getElementById('shareText').textContent + ' ' + window.location.href;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    btn.textContent = 'Copied';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+  });
+}
+
+function retakeQuiz() {
+  scores = { G: 0, A: 0, Q: 0 };
+  current = 0;
+  selectedOption = null;
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  renderQuestion();
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
