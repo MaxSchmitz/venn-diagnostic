@@ -717,31 +717,24 @@ function nextQuestion() {
   }
 }
 
-function buildVenn(gHigh, aHigh, qHigh) {
+function buildVenn(gPct, aPct, qPct) {
   // Circle centers and radius for the Venn diagram
   const cx1 = 165, cy1 = 140, r = 105; // German (top-left)
   const cx2 = 275, cy2 = 140;           // Autistic (top-right)
   const cx3 = 220, cy3 = 235;           // Gay (bottom-center)
 
-  // Dot positions for each region
-  const dots = {
-    G:   { x: 125, y: 100 },
-    A:   { x: 315, y: 100 },
-    Q:   { x: 220, y: 290 },
-    GA:  { x: 220, y: 105 },
-    GQ:  { x: 160, y: 215 },
-    AQ:  { x: 280, y: 215 },
-    GAQ: { x: 220, y: 175 },
-    none:{ x: 30,  y: 30  }
-  };
-
-  let key = '';
-  if (gHigh) key += 'G';
-  if (aHigh) key += 'A';
-  if (qHigh) key += 'Q';
-  if (!key) key = 'none';
-
-  const dot = dots[key];
+  // Weighted dot position based on actual scores
+  const outside = { x: 30, y: 30 };
+  const total = gPct + aPct + qPct;
+  let dot;
+  if (total < 5) {
+    dot = outside;
+  } else {
+    dot = {
+      x: (gPct * cx1 + aPct * cx2 + qPct * cx3) / total,
+      y: (gPct * cy1 + aPct * cy2 + qPct * cy3) / total
+    };
+  }
 
   return `<svg viewBox="0 0 440 360" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -797,7 +790,7 @@ function showResults() {
   document.getElementById('resultSubtype').textContent = r.subtype;
   document.getElementById('resultDescription').innerHTML = r.description;
   document.getElementById('shareText').textContent = r.shareText;
-  document.getElementById('vennContainer').innerHTML = buildVenn(gHigh, aHigh, qHigh);
+  document.getElementById('vennContainer').innerHTML = buildVenn(gPct, aPct, qPct);
 
   setTimeout(() => {
     document.getElementById('barGerman').style.width = gPct + '%';
